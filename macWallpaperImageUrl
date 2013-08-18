@@ -1,0 +1,30 @@
+#!/bin/bash
+
+USAGE="Usage: `basename $0` <image url>"
+
+if (( $# != 1 )); then
+    echo $USAGE
+    exit 1
+fi
+
+URL=$1
+TMPIMAGE="/tmp/desktop-background.jpg"
+TMPIMAGERELOAD="/tmp/desktop-background-reload.jpg"
+
+function set_wallpaper {
+    IMAGEFILE=$1
+    APPSCRIPT="
+tell application \"Finder\"
+    set desktop picture to POSIX file \"$IMAGEFILE\"
+end tell"
+    echo "${APPSCRIPT}" | osascript -
+}
+
+# download
+curl -s -o $TMPIMAGE $URL
+
+# change the wallpaper twice with a different filename
+# to force the reload by the Finder.
+cp $TMPIMAGE $TMPIMAGERELOAD
+set_wallpaper $TMPIMAGERELOAD
+set_wallpaper $TMPIMAGE
